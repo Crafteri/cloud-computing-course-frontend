@@ -1,7 +1,15 @@
 import { Alert, Box, Button, Card, Input, Stack, Typography } from '@mui/material'
+import axios from 'axios';
 import { useState } from 'react'
 
+const axiosConfig = {
+  baseURL: import.meta.env.VITE_API_URL
+};
+
 function App() {
+
+  // Setup axios base URL
+  axios.defaults.baseURL = axiosConfig.baseURL;
 
   const [inputText, setInputText] = useState('')
   const [textLog, setTextLog] = useState([])
@@ -20,7 +28,19 @@ function App() {
     }
   };
 
-  const handleButton = () => {
+  const sentimentAnalysis = async (text) => {
+    // This is the real sentiment analysis function
+    try {
+      const {data: { sentiment }} = await axios.post('/sentiment', {text: text}, {headers: {"Access-Control-Allow-Origin": "*"}})
+      return sentiment;
+    } catch (error) {
+      console.log("Could not analyze sentiment", error)
+      return 'unknown'
+    }
+  }
+
+
+  const handleButton = async () => {
 
     // Check if the input text is empty
     if (inputText === '') {
@@ -29,7 +49,7 @@ function App() {
 
     try {
       // Analyze and reformat the output
-      const sentiment = fakeSentimentAnalysis(inputText)
+      const sentiment = await sentimentAnalysis(inputText)
       const analysis = {
         text: inputText,
         sentiment: sentiment,
@@ -69,7 +89,6 @@ function App() {
             Predict
           </Button>
         </Stack>
-        <Typography sx={{mt:2}} variant="body2" color='warning.main'>Fake analysis only—no connection to back-end yet.</Typography>
       </Card>
       <Box sx={{flexGrow:0, flexShrink: 1, overflowY: 'auto'}}>
         {textLog.map((analysis, index) => (
