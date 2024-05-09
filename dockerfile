@@ -13,6 +13,13 @@ RUN npm install
 # Copy rest of the source files
 COPY . .
 
+# Set environment variables
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+# Populate environment variables into .env file
+RUN echo "VITE_API_URL=$VITE_API_URL" > .env
+
 # Build the app
 RUN npm run build
 
