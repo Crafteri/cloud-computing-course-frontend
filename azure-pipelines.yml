@@ -1,0 +1,44 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'Rahti frontend'
+    version: '4.2'
+    cmd: 'oc project cloud-computing-course-azure'
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'Rahti frontend'
+    version: '4.2'
+    cmd: 'oc new-app https://$(github_token)@github.com/Crafteri/cloud-computing-course-frontend.git'
+    ignoreFlag: true
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'Rahti frontend'
+    version: '4.2'
+    cmd: 'oc expose svc cloud-computing-course-frontend'
+    ignoreFlag: true
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'Rahti frontend'
+    version: '4.2'
+    cmd: 'oc start-build cloud-computing-course-frontend --follow'
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'Rahti frontend'
+    version: '4.2'
+    cmd: 'oc status'
